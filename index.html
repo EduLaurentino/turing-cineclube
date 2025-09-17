@@ -128,12 +128,14 @@
     // Ajuste do álbum: agora utilizamos imagens locais em /fotos com nomes claros
     // Cada item terá uma pequena descrição que aparece como legenda no hover
     const ALBUM = [
-      { src: "fotos/capa_principal.png", alt: "Capa principal do Turing Cineclube" },
+      // Atualizamos as imagens para usar os arquivos finais incluídos no diretório fotos.
+      // As URLs com espaços e vírgulas são codificadas (%20 para espaço, %2C para vírgula) para funcionamento correto em navegadores.
+      { src: "fotos/capa_home_page.png", alt: "Capa principal do Turing Cineclube" },
       { src: "fotos/capa_enigma.png", alt: "Cartaz enigmático do cineclube" },
-      { src: "fotos/programacao_em_ciclos.png", alt: "Visão geral dos ciclos programados" },
+      { src: "fotos/programação_em_ciclos.png", alt: "Visão geral dos ciclos programados" },
       { src: "fotos/arquitetura_e_espaco_domestico.png", alt: "Ciclo Arquitetura e Espaço Doméstico" },
-      { src: "fotos/utopia_distopia_e_urbanismo.png", alt: "Ciclo Utopia, Distopia e Urbanismo" },
-      { src: "fotos/ia_e_o_humano.png", alt: "Ciclo Inteligência Artificial e o Humano" },
+      { src: "fotos/utopia%2C%20distopia%20e%20urbanismo.png", alt: "Ciclo Utopia, Distopia e Urbanismo" },
+      { src: "fotos/IA_e_o_humano.png", alt: "Ciclo Inteligência Artificial e o Humano" },
     ];
 
     function Header({ route, setRoute }) {
