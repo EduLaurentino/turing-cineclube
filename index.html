@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Turing Cineclube</title>
+  <!-- Tailwind via CDN for quick styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React and ReactDOM UMD builds -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Use Babel to transform JSX in the browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    /* Hide scrollbar for album scroll area */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+  </style>
+</head>
+<body class="bg-[#f4f4f2] text-[#1a1a1a]">
+  <div id="root"></div>
+  <script type="text/babel">
+    // Dados dos ciclos e álbum
+    const CYCLES = [
+      {
+        title: "1. Inteligência Artificial e o Humano",
+        films: [
+          { title: "2001: Uma Odisseia no Espaço", year: 1968, director: "Stanley Kubrick" },
+          { title: "Her", year: 2013, director: "Spike Jonze" },
+          { title: "A.I. – Inteligência Artificial", year: 2001, director: "Steven Spielberg" },
+          { title: "Sessão Dupla Especial", double: [
+            { title: "Metropolis", year: 1927, director: "Fritz Lang" },
+            { title: "Ex Machina", year: 2014, director: "Alex Garland" },
+          ] },
+        ],
+      },
+      {
+        title: "2. Utopia, Distopia e Urbanismo",
+        films: [
+          { title: "O Som ao Redor", year: 2012, director: "Kleber Mendonça Filho" },
+          { title: "Wall·E", year: 2008, director: "Andrew Stanton" },
+          { title: "Blade Runner 2049", year: 2017, director: "Denis Villeneuve" },
+          { title: "Sessão Dupla Especial", double: [
+            { title: "Brazil", year: 1985, director: "Terry Gilliam" },
+            { title: "Atlantique", year: 2019, director: "Mati Diop" },
+          ] },
+        ],
+      },
+      {
+        title: "3. Arquitetura e Espaço Doméstico",
+        films: [
+          { title: "Parasita", year: 2019, director: "Bong Joon-ho" },
+          { title: "Dogville", year: 2003, director: "Lars von Trier" },
+          { title: "Que Horas Ela Volta?", year: 2015, director: "Anna Muylaert" },
+          { title: "Sessão Dupla Especial", double: [
+            { title: "Aquarius", year: 2016, director: "Kleber Mendonça Filho" },
+            { title: "Edifício Master", year: 2002, director: "Eduardo Coutinho" },
+          ] },
+        ],
+      },
+      {
+        title: "4. Filmes para Gatos Assistirem com Você",
+        films: [
+          { title: "Cats", year: 2019, director: "Tom Hooper" },
+          { title: "Garfield", year: 2004, director: "Peter Hewitt" },
+          { title: "O Serviço de Entregas da Kiki", year: 1989, director: "Hayao Miyazaki" },
+          { title: "Sessão Dupla Especial", double: [
+            { title: "Flow", year: 2024, director: "Gints Zilbalodis" },
+            { title: "O Menino e o Mundo", year: 2013, director: "Alê Abreu" },
+          ] },
+        ],
+      },
+      {
+        title: "5. Temporalidades Quebradas",
+        films: [
+          { title: "Primer", year: 2004, director: "Shane Carruth" },
+          { title: "O Grande Truque", year: 2006, director: "Christopher Nolan" },
+          { title: "Synecdoche, New York", year: 2008, director: "Charlie Kaufman" },
+          { title: "Sessão Dupla Especial", double: [
+            { title: "Homem-Aranha no Aranhaverso", year: 2018, director: "Peter Ramsey, Rodney Rothman, Bob Persichetti" },
+            { title: "Homem-Aranha: Através do Aranhaverso", year: 2023, director: "Joaquim Dos Santos, Kemp Powers, Justin K. Thompson" },
+          ] },
+        ],
+      },
+      {
+        title: "6. Afetos, Memória e Perda",
+        films: [
+          { title: "The Father", year: 2020, director: "Florian Zeller" },
+          { title: "Retrato de uma Jovem em Chamas", year: 2019, director: "Céline Sciamma" },
+          { title: "In the Mood for Love", year: 2000, director: "Wong Kar-wai" },
+          { title: "Sessão Dupla Especial", double: [
+            { title: "Brokeback Mountain", year: 2005, director: "Ang Lee" },
+            { title: "Praia do Futuro", year: 2014, director: "Karim Aïnouz" },
+          ] },
+        ],
+      },
+      {
+        title: "7. Brasil Queer e Popular",
+        films: [
+          { title: "Tatuagem", year: 2013, director: "Hilton Lacerda" },
+          { title: "Deus e o Diabo na Terra do Sol", year: 1964, director: "Glauber Rocha" },
+          { title: "O Pagador de Promessas", year: 1962, director: "Anselmo Duarte" },
+          { title: "Sessão Dupla Especial", double: [
+            { title: "Motel Destino", year: 2024, director: "Karim Aïnouz" },
+            { title: "Baby", year: 2024, director: "Marcelo Caetano" },
+          ] },
+        ],
+      },
+      {
+        title: "8. O Horror como Espelho",
+        films: [
+          { title: "Pânico (Pânico 4)", year: 2011, director: "Wes Craven" },
+          { title: "O Babadook", year: 2014, director: "Jennifer Kent" },
+          { title: "Midsommar", year: 2019, director: "Ari Aster" },
+          { title: "Sessão Dupla Especial (Gore)", double: [
+            { title: "O Exorcista", year: 1973, director: "William Friedkin" },
+            { title: "The Substance", year: 2024, director: "Coralie Fargeat" },
+          ] },
+        ],
+      },
+    ];
+
+    // Ajuste do álbum: agora utilizamos imagens locais em /fotos com nomes claros
+    // Cada item terá uma pequena descrição que aparece como legenda no hover
+    const ALBUM = [
+      { src: "fotos/capa_principal.png", alt: "Capa principal do Turing Cineclube" },
+      { src: "fotos/capa_enigma.png", alt: "Cartaz enigmático do cineclube" },
+      { src: "fotos/programacao_em_ciclos.png", alt: "Visão geral dos ciclos programados" },
+      { src: "fotos/arquitetura_e_espaco_domestico.png", alt: "Ciclo Arquitetura e Espaço Doméstico" },
+      { src: "fotos/utopia_distopia_e_urbanismo.png", alt: "Ciclo Utopia, Distopia e Urbanismo" },
+      { src: "fotos/ia_e_o_humano.png", alt: "Ciclo Inteligência Artificial e o Humano" },
+    ];
+
+    function Header({ route, setRoute }) {
+      const [mobileOpen, setMobileOpen] = React.useState(false);
+      const menuItems = [
+        { key: 'home', label: 'Home Page' },
+        { key: 'proposta', label: 'A Proposta' },
+        { key: 'ciclos', label: 'Ciclos' },
+        { key: 'album', label: 'Album' },
+      ];
+      return (
+        <header className="sticky top-0 w-full z-50 border-b" style={{ borderColor: '#1a1a1a', backgroundColor: '#f4f4f2' }}>
+          <div className="max-w-6xl mx-auto flex items-center justify-between py-4 px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-3 select-none">
+              {/* Geometric mark */}
+              <div className="relative w-10 h-10 mr-1">
+                <div className="absolute inset-0 rounded-full" style={{ backgroundColor: '#ffd166' }}></div>
+                <div className="absolute left-1 top-1 w-5 h-5" style={{ backgroundColor: '#1d3557' }}></div>
+                <div className="absolute right-1 bottom-1 w-5 h-2" style={{ backgroundColor: '#e63946' }}></div>
+              </div>
+              <div className="leading-tight">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ color: '#1a1a1a' }}>Turing Cineclube</h1>
+                <p className="text-xs sm:text-sm" style={{ color: '#1d3557' }}>Um clube para ver, pensar e delirar juntos.</p>
+              </div>
+            </div>
+            {/* Desktop menu */}
+            <nav className="hidden md:flex items-center gap-6">
+              {menuItems.map(item => (
+                <button key={item.key} onClick={() => setRoute(item.key)}
+                        className={route === item.key ? 'underline underline-offset-4' : ''}
+                        style={{ color: '#1a1a1a' }}>
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+            {/* Mobile toggle */}
+            <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu" style={{ color: '#1a1a1a' }}>
+              {mobileOpen ? 'Fechar' : 'Menu'}
+            </button>
+          </div>
+          {mobileOpen && (
+            <div className="md:hidden border-t" style={{ borderColor: '#1a1a1a' }}>
+              <div className="max-w-6xl mx-auto grid grid-cols-2 gap-2 py-2 px-4">
+                {menuItems.map(item => (
+                  <button key={item.key} onClick={() => { setRoute(item.key); setMobileOpen(false); }} className="py-2 px-3 text-left rounded hover:bg-gray-100" style={{ color: '#1a1a1a' }}>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </header>
+      );
+    }
+
+    /**
+     * Página inicial com destaque para a proposta do cineclube e um chamado à ação.
+     * Recebe setRoute como prop para permitir navegação programática ao clicar no botão CTA.
+     */
+    function HomePage({ setRoute }) {
+      return (
+        <main>
+          <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="grid md:grid-cols-2 gap-10 items-center">
+              <div className="space-y-6">
+                <h2 className="text-4xl md:text-5xl font-black leading-tight" style={{ color: '#1a1a1a' }}>Turing Cineclube</h2>
+                <p className="text-lg md:text-xl leading-relaxed" style={{ color: '#1d3557' }}>
+                  Um espaço de encontro, conversa e experimentação. Sessões temáticas,
+                  ciclos cuidadosamente curados e um pós-filme que valoriza o debate.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <span className="px-3 py-1 text-xs font-semibold rounded" style={{ backgroundColor: '#ffd166', color: '#1a1a1a' }}>Ver</span>
+                  <span className="px-3 py-1 text-xs font-semibold rounded" style={{ backgroundColor: '#e63946', color: 'white' }}>Pensar</span>
+                  <span className="px-3 py-1 text-xs font-semibold rounded" style={{ backgroundColor: '#1d3557', color: 'white' }}>Delirar</span>
+                </div>
+                {/* Botão de chamada para a programação */}
+                <div className="mt-6">
+                  <button
+                    onClick={() => setRoute('ciclos')}
+                    className="inline-block px-6 py-3 rounded-full font-semibold shadow transition-all duration-200 hover:shadow-lg"
+                    style={{ backgroundColor: '#1d3557', color: 'white' }}
+                  >
+                    Confira a Programação
+                  </button>
+                </div>
+              </div>
+              <div className="relative w-full aspect-square rounded-2xl overflow-hidden shadow">
+                <div className="absolute inset-0" style={{ backgroundColor: '#faf5e6' }}></div>
+                <div className="absolute left-6 top-6 w-1/3 h-1/3 rounded-full" style={{ backgroundColor: '#ffd166' }}></div>
+                <div className="absolute right-6 top-8 w-1/4 h-1/2" style={{ backgroundColor: '#1d3557' }}></div>
+                <div className="absolute left-1/2 bottom-8 -translate-x-1/2 w-2/3 h-6" style={{ backgroundColor: '#e63946' }}></div>
+                <div className="absolute left-8 bottom-8 w-12 h-12 rotate-12" style={{ backgroundColor: '#1a1a1a' }}></div>
+              </div>
+            </div>
+          </section>
+        </main>
+      );
+    }
+
+    function PropostaPage() {
+      return (
+        <main>
+          <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-black mb-6" style={{ color: '#1a1a1a' }}>A Proposta</h2>
+              <p className="text-lg leading-8 mb-6" style={{ color: '#1d3557' }}>
+                O Turing Cineclube é um convite para ver, pensar e delirar juntos. A cada
+                encontro, propomos uma experiência coletiva: assistir, conversar e abrir
+                trilhas entre filmes, ideias e sentidos. A curadoria privilegia o encontro
+                entre obras de diferentes épocas e geografias, aproximando cinema,
+                arquitetura, teoria e vida cotidiana.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-6 mt-10">
+                <div className="relative aspect-[4/3] rounded-xl overflow-hidden border" style={{ borderColor: '#1a1a1a' }}>
+                  <div className="absolute inset-0" style={{ backgroundColor: '#faf5e6' }}></div>
+                  <div className="absolute left-6 top-6 w-24 h-24 rounded-full" style={{ backgroundColor: '#ffd166' }}></div>
+                  <div className="absolute right-6 bottom-6 w-1/2 h-4" style={{ backgroundColor: '#e63946' }}></div>
+                  <div className="absolute right-8 top-8 w-20 h-40" style={{ backgroundColor: '#1d3557' }}></div>
+                </div>
+                <div className="relative aspect-[4/3] rounded-xl overflow-hidden border" style={{ borderColor: '#1a1a1a' }}>
+                  <div className="absolute inset-0" style={{ backgroundColor: '#f4f4f2' }}></div>
+                  <div className="absolute left-10 bottom-8 w-3/4 h-3" style={{ backgroundColor: '#1a1a1a' }}></div>
+                  <div className="absolute left-10 top-10 w-28 h-28 rotate-6" style={{ backgroundColor: '#e63946' }}></div>
+                  <div className="absolute right-10 top-6 w-20 h-20 rounded-full" style={{ backgroundColor: '#ffd166' }}></div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      );
+    }
+
+    function CycleCard({ ciclo, idx }) {
+      const [open, setOpen] = React.useState(false);
+      return (
+        <div
+          className="rounded-2xl border overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+          style={{ borderColor: '#1a1a1a', backgroundColor: 'white' }}
+        >
+          <button
+            onClick={() => setOpen(!open)}
+            className={`w-full text-left px-5 py-4 flex items-center justify-between hover:opacity-90`}
+            style={{ backgroundColor: idx % 2 === 0 ? '#faf5e6' : '#f4f4f2', color: '#1a1a1a' }}
+          >
+            <span className="font-bold">{ciclo.title}</span>
+            <span
+              className="ml-4 text-xs font-mono px-2 py-1 rounded"
+              style={{ backgroundColor: '#ffd166', color: '#1a1a1a' }}
+            >
+              {open ? '-' : '+'}
+            </span>
+          </button>
+          {open && (
+            <div className="px-5 bg-white">
+              <div className="grid md:grid-cols-2 gap-6 py-6">
+                <div>
+                  <ul className="space-y-3">
+                    {ciclo.films.map((f, i) => (
+                      <li
+                        key={i}
+                        className="p-3 rounded-xl border transition-colors duration-200"
+                        style={{ borderColor: '#1a1a1a', backgroundColor: '#fdfdfc' }}
+                      >
+                        {'double' in f ? (
+                          <div>
+                            <p className="font-semibold" style={{ color: '#1a1a1a' }}>{f.title}</p>
+                            <p className="text-sm mt-1" style={{ color: '#1d3557' }}>
+                              {f.double.map(d => `${d.title} (${d.year}, ${d.director})`).join('  +  ')}
+                            </p>
+                          </div>
+                        ) : (
+                          <div>
+                            <p className="font-semibold" style={{ color: '#1a1a1a' }}>
+                              {f.title}{' '}
+                              <span className="opacity-70 font-normal">({f.year}, {f.director})</span>
+                            </p>
+                            <p className="text-sm mt-1" style={{ color: '#1d3557' }}>
+                              {/* Espaço para sinopse — substitua por texto real. */}
+                              Sinopse breve aqui.
+                            </p>
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function CiclosPage() {
+      return (
+        <main>
+          {/*Âncora para navegação direta à seção de ciclos*/}
+          <section id="ciclos" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <h2 className="text-3xl md:text-4xl font-black mb-6" style={{ color: '#1a1a1a' }}>Ciclos</h2>
+            <p className="mb-8 max-w-3xl" style={{ color: '#1d3557' }}>
+              Cada ciclo reúne quatro encontros — geralmente três sessões únicas e uma
+              sessão dupla especial. Expanda os módulos abaixo para ver os filmes,
+              diretores e um espaço para sinopses e cartazes oficiais.
+            </p>
+            <div className="space-y-4">
+              {CYCLES.map((c, i) => <CycleCard key={i} ciclo={c} idx={i} />)}
+            </div>
+          </section>
+        </main>
+      );
+    }
+
+    // Galeria de fotos com overlay de legenda
+    function AlbumPage() {
+      return (
+        <main>
+          <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <h2 className="text-3xl md:text-4xl font-black mb-6" style={{ color: '#1a1a1a' }}>Álbum</h2>
+            <p className="mb-8 max-w-3xl" style={{ color: '#1d3557' }}>
+              Uma seleção de momentos, cartazes e texturas que compõem a identidade visual do Turing Cineclube.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {ALBUM.map((item, i) => (
+                <div key={i} className="relative group overflow-hidden rounded-2xl shadow-lg border" style={{ borderColor: '#1a1a1a' }}>
+                  <img src={item.src} alt={item.alt} className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300">
+                    <p className="text-white text-center px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-sm">
+                      {item.alt}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </main>
+      );
+    }
+
+    
+    function Footer() {
+      const currentYear = new Date().getFullYear();
+      return (
+        <footer className="mt-16 border-t" style={{ borderColor: '#1a1a1a' }}>
+          <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Chamada para participação */}
+            <div className="mb-6 text-center">
+              <h3 className="text-xl font-bold mb-2" style={{ color: '#1a1a1a' }}>Faça parte do Turing Cineclube!</h3>
+              <p className="text-sm" style={{ color: '#1d3557' }}>Junte-se ao nosso grupo e venha ver, pensar e delirar conosco.</p>
+              <a href="#" className="inline-block mt-3 px-5 py-2 rounded-full font-semibold shadow hover:shadow-md transition-all duration-200" style={{ backgroundColor: '#e63946', color: 'white' }}>Participar</a>
+            </div>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm" style={{ color: '#1a1a1a' }}>
+              <p>© {currentYear} Turing Cineclube — ver, pensar e delirar juntos.</p>
+              <div className="flex items-center gap-3">
+                <a href="#" className="underline" aria-label="Instagram">Instagram</a>
+                <a href="#" className="underline" aria-label="Newsletter">Newsletter</a>
+              </div>
+            </div>
+          </section>
+        </footer>
+      );
+    }
+
+    function App() {
+      const [route, setRoute] = React.useState('home');
+      return (
+        <div className="min-h-screen" style={{ backgroundColor: '#f4f4f2' }}>
+          <Header route={route} setRoute={setRoute} />
+          {route === 'home' && <HomePage setRoute={setRoute} />}
+          {route === 'proposta' && <PropostaPage />}
+          {route === 'ciclos' && <CiclosPage />}
+          {route === 'album' && <AlbumPage />}
+          <Footer />
+        </div>
+      );
+    }
+    // Renderizar
+    const rootElement = document.getElementById('root');
+    ReactDOM.createRoot(rootElement).render(<App />);
+  </script>
+</body>
+</html>
